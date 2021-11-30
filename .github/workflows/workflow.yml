@@ -14,11 +14,6 @@ jobs:
       - uses: actions/checkout@v2
       - uses: hadolint/hadolint-action@v1.6.0
         with:
-          dockerfile: redirect/Dockerfile
-          ignore: DL3006
-      - uses: hadolint/hadolint-action@v1.6.0
-        with:
-          dockerfile: short/Dockerfile
           ignore: DL3006
   docker-image:
     runs-on: ubuntu-latest
@@ -32,17 +27,10 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: redirect
-        id: redirect
+      - name: build
+        id: build
         uses: docker/build-push-action@v2
         with:
-          file: redirect/Dockerfile
           push: true
-          tags: hsmtkk/supreme-train:redirect-latest
-      - name: short
-        id: short
-        uses: docker/build-push-action@v2
-        with:
-          file: short/Dockerfile
-          push: true
-          tags: hsmtkk/supreme-train:short-latest
+          tags: hsmtkk/supreme-train:latest
+ 

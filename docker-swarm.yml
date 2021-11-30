@@ -7,11 +7,13 @@ services:
       - "8000:80"
   redis:
     image: redis:6.2.6
-  short:
-    image: hsmtkk/supreme-train:short-latest
+  redirect:
+    image: hsmtkk/supreme-train:latest
+    entrypoint: /usr/local/bin/redirect
     environment:
       REDIS_HOST: redis
-  redirect:
-    image: hsmtkk/supreme-train:redirect-latest
+  short:
+    image: hsmtkk/supreme-train:latest
+    entrypoint: /usr/local/bin/short
     environment:
       REDIS_HOST: redis
