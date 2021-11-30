@@ -1,0 +1,16 @@
+version: "3.8"
+services:
+  nginx:
+    image: nginx:1.21.4
+    ports:
+      - "8000:80"
+  redis:
+    image: redis:6.2.6
+  short:
+    image: hsmtkk/supreme-train:short-latest
+    environment:
+      REDIS_HOST: redis
+  redirect:
+    image: hsmtkk/supreme-train:redirect-latest
+    environment:
+      REDIS_HOST: redis
