@@ -1,14 +1,10 @@
-name: Docker Image CI
-
+---
+name: docker-build
 on: push
-
 jobs:
-
-  build:
-
+  docker-build:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v2
-    - name: build redirect docker image
-      run: docker build . --file rediret/Dockerfile --tag supreme-train:latest
+      - uses: actions/checkout@v2
+      - name: build redirect docker image
+        run: docker build . --file redirect/Dockerfile --tag supreme-train:latest
