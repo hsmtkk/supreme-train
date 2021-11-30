@@ -15,9 +15,11 @@ jobs:
       - uses: hadolint/hadolint-action@v1.6.0
         with:
           dockerfile: redirect/Dockerfile
+          ignore: DL3006
       - uses: hadolint/hadolint-action@v1.6.0
         with:
           dockerfile: short/Dockerfile
+          ignore: DL3006
   docker-image:
     runs-on: ubuntu-latest
     steps:
