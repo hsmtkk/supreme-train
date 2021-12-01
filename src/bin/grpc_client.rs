@@ -9,13 +9,16 @@ pub mod url_short {
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut client = UrlShortClient::connect("http://[::1]:50051").await?;
 
-    let request = tonic::Request::new(ShortRequest {
-        url: "Tonic".into(),
+    let req = tonic::Request::new(ShortRequest {
+        url: "http://www.example.com".to_string(),
     });
+    let resp = client.short(req).await?;
+    println!("{:?}", resp);
 
-    let response = client.short(request).await?;
-
-    println!("RESPONSE={:?}", response);
+    let shorten = resp.into_inner().shorten;
+    let req = tonic::Request::new(ExpandRequest{shorten});
+    let resp = client.expand(req).await?;
+    println!("{:?}", resp);
 
     Ok(())
 }

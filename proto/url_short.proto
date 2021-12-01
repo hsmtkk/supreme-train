@@ -7,11 +7,11 @@ message ShortRequest {
 }
 
 message ShortResponse {
-    string id = 1;
+    string shorten = 1;
 }
 
 message ExpandRequest {
-    string id = 1;
+    string shorten = 1;
 }
 
 message ExpandResponse {
