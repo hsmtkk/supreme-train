@@ -1,0 +1,50 @@
+use axum::extract;
+use axum::response;
+use nanoid::nanoid;
+use r2d2_memcache::MemcacheConnectionManager;
+use serde::{Serialize, Deserialize};
+
+#[tokio::main]
+async fn main() {
+    env_logger::init();
+    let memcache_host = must_env_var("MEMCACHE_HOST");
+    let memcache_port = must_env_var("MEMCACHE_PORT");
+
+    let memcache_url = format!("memcache://{}:{}", memcache_host, memcache_port);
+    let manager =  MemcacheConnectionManager::new(memcache_url);
+    let pool = r2d2::Pool::builder()
+        .build(manager)
+        .expect("failed to init r2d2 pool");
+
+    let app = axum::Router::new()
+        .route("/short_url", axum::routing::post(short_url))
+        .layer(axum::AddExtensionLayer::new(pool));
+
+    axum::Server::bind(&"0.0.0.0:3000".parse().unwrap())
+        .serve(app.into_make_service())
+        .await
+        .unwrap();
+}
+
+fn must_env_var(key: &str) -> String {
+    let val = std::env::var(key).unwrap_or_else(|_| format!("{} env var must be defined", key));
+    val
+}
+
+#[derive(Deserialize)]
+struct Req {
+    url: String,
+}
+
+#[derive(Serialize)]
+struct Resp {
+    shorten: String,
+}
+
+async fn short_url(extract::Extension(pool): extract::Extension<r2d2::Pool<MemcacheConnectionManager>>, extract::Json(payload): extract::Json<Req>) -> response::Json<Resp> {
+    let url = payload.url;
+    let shorten = nanoid!(8);
+    let conn = pool.get().expect("failed to get connection");
+    conn.set(&shorten, &url, 0).expect("failed to set key&value");
+    response::Json(Resp{shorten})
+}

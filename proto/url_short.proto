@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package url_short;
+
+message ShortRequest {
+    string url = 1;
+}
+
+message ShortResponse {
+    string id = 1;
+}
+
+message ExpandRequest {
+    string id = 1;
+}
+
+message ExpandResponse {
+    string url = 1;
+}
+
+service UrlShort {
+    rpc Short(ShortRequest) returns (ShortResponse){};
+    rpc Expand(ExpandRequest) returns (ExpandResponse){};
+}

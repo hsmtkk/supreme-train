@@ -15,6 +15,15 @@ jobs:
       - uses: hadolint/hadolint-action@v1.6.0
         with:
           ignore: DL3006
+  cargo-clippy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: rustup component add clippy
+      - uses: actions-rs/clippy-check@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          args: --all-features
   docker-image:
     runs-on: ubuntu-latest
     steps:
@@ -33,4 +42,3 @@ jobs:
         with:
           push: true
           tags: hsmtkk/supreme-train:latest
- 
