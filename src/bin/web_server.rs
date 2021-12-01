@@ -1,7 +1,5 @@
 use axum::extract;
 use axum::response;
-use nanoid::nanoid;
-use r2d2_memcache::MemcacheConnectionManager;
 use serde::{Serialize, Deserialize};
 use url_short::url_short_client::UrlShortClient;
 use url_short::{ShortRequest, ExpandRequest};
@@ -40,10 +38,17 @@ struct Resp {
     shorten: String,
 }
 
-async fn short_url(extract::Extension(pool): extract::Extension<r2d2::Pool<MemcacheConnectionManager>>, extract::Json(payload): extract::Json<Req>) -> response::Json<Resp> {
+async fn short(extract::Extension(grpc_client): extract::Extension<UrlShortClient<T>>, extract::Json(payload): extract::Json<Req>) -> response::Json<Resp> {
     let url = payload.url;
-    let shorten = nanoid!(8);
-    let conn = pool.get().expect("failed to get connection");
-    conn.set(&shorten, &url, 0).expect("failed to set key&value");
+    let req = tonic::Request::new(ShortRequest {url});
+    let resp = grpc_client.short(req).await?;
+    let shorten = resp.into_inner().shorten;
     response::Json(Resp{shorten})
+}
+
+async fn expand(extract::Extension(grpc_client): extract::Extension<UrlShortClient<T>>, extract::Path(shorten): extract::Path<&str>) {
+    let req = tonic::Request::new(ExpandRequest{shorten});
+    let resp = grpc_client.expand(req).await?;
+    let url = resp.into_inner().url;
+    unimplemented!()
 }
